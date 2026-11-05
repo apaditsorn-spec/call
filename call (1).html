@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>การโทร · Care Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0b5ed7;--navy:#0a2f6b;--green:#12a05c;--red:#d9363e;--ink:#fff;--mute:#a9bbdc}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--ink);background:radial-gradient(120% 90% at 50% 0%,#17489a 0%,#0a2f6b 45%,#061a3f 100%);-webkit-tap-highlight-color:transparent}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column}
+#remote{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#061a3f}
+#remote.off{visibility:hidden}
+.top{position:relative;z-index:2;padding:calc(18px + env(safe-area-inset-top)) 18px 40px;text-align:center;background:linear-gradient(180deg,rgba(6,26,63,.75),rgba(6,26,63,0))}
+.brand{font-size:.8rem;letter-spacing:.5px;color:var(--mute)}
+.mid{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 24px}
+.av{width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:3rem;font-weight:700;position:relative}
+.av.ring::before,.av.ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(255,255,255,.5);animation:pulse 2s ease-out infinite}
+.av.ring::after{animation-delay:1s}
+@keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(1.7);opacity:0}}
+@media(prefers-reduced-motion:reduce){.av.ring::before,.av.ring::after{animation:none}}
+.who{font-size:1.5rem;font-weight:700;margin:0;word-break:break-word}
+.st{font-size:1rem;color:#d8e5ff;margin:0;min-height:1.6em}
+.tm{font-variant-numeric:tabular-nums;font-size:1.05rem;color:#fff}
+.has-video .mid{justify-content:flex-start;padding-top:0}
+.has-video .av{display:none}
+.has-video .who,.has-video .st{text-shadow:0 1px 6px rgba(0,0,0,.6)}
+#local{position:absolute;z-index:3;right:14px;top:calc(76px + env(safe-area-inset-top));width:104px;aspect-ratio:3/4;object-fit:cover;border-radius:14px;border:2px solid rgba(255,255,255,.6);background:#000;transform:scaleX(-1);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+#local[hidden]{display:none}
+.bar{position:relative;z-index:4;display:flex;justify-content:center;gap:18px;padding:22px 16px calc(28px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(6,26,63,.8),rgba(6,26,63,0))}
+.cb{width:62px;height:62px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px)}
+.cb svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cb:hover{background:rgba(255,255,255,.26)}
+.cb.on{background:#fff;color:var(--navy)}
+.cb.end{background:var(--red)}
+.cb.end:hover{background:#c22b33}
+.cb[hidden]{display:none}
+.cb:focus-visible,.btn:focus-visible{outline:3px solid #ffd54a;outline-offset:3px}
+.lab{display:block;font-size:.75rem;color:var(--mute);margin-top:6px;text-align:center}
+.col{display:flex;flex-direction:column;align-items:center}
+.btn{min-height:48px;padding:0 26px;border:0;border-radius:999px;background:#fff;color:var(--navy);font:inherit;font-weight:700;cursor:pointer}
+.msg{position:fixed;z-index:6;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(6,26,63,.88);text-align:center}
+.msg.show{display:flex}
+.msg .box{max-width:380px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.msg h2{margin:0;font-size:1.3rem}
+.msg p{margin:0;color:#d8e5ff}
+.tap{position:fixed;z-index:5;left:50%;bottom:130px;transform:translateX(-50%)}
+.tap[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <video id="remote" autoplay playsinline class="off"></video>
+  <video id="local" autoplay playsinline muted hidden></video>
+  <div class="top"><div class="brand">Care Center</div></div>
+  <div class="mid">
+    <div class="av ring" id="av" aria-hidden="true"><span id="ini">?</span></div>
+    <h1 class="who" id="who">กำลังเตรียมการโทร</h1>
+    <p class="st" id="st" role="status" aria-live="polite">กำลังขออนุญาตใช้ไมโครโฟน...</p>
+    <div class="tm" id="tm" hidden>00:00</div>
+  </div>
+  <button class="btn tap" id="tap" hidden>แตะเพื่อเปิดเสียง</button>
+  <div class="bar" id="bar">
+    <div class="col"><button class="cb" id="b-mic" aria-label="ปิดไมค์" aria-pressed="false"></button><span class="lab">ไมค์</span></div>
+    <div class="col" id="c-cam"><button class="cb" id="b-cam" aria-label="ปิดกล้อง" aria-pressed="false"></button><span class="lab">กล้อง</span></div>
+    <div class="col"><button class="cb end" id="b-end" aria-label="วางสาย"></button><span class="lab">วางสาย</span></div>
+  </div>
+</div>
+<div class="msg" id="msg" role="alertdialog" aria-labelledby="m-t"><div class="box"><h2 id="m-t"></h2><p id="m-p"></p><button class="btn" id="m-b">ปิดหน้าต่างนี้</button></div></div>
+
+<script>
+(function () {
+  'use strict';
+  try { window.opener = null; } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var P = new URLSearchParams(location.hash.slice(1));
+  var API = P.get('a') || '', CT = P.get('t') || '', KIND = P.get('k') === 'video' ? 'video' : 'audio', PEER = (P.get('n') || '').slice(0, 80);
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  var API_OK = /^https:\/\/script\.google\.com\/(a\/[A-Za-z0-9.\-]+\/)?macros\/s\/[A-Za-z0-9_\-]+\/exec$/.test(API);
+
+  var ICO = {
+    mic: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    micoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18M9 9v2a3 3 0 0 0 5 2.2M15 9.5V6a3 3 0 0 0-5.7-1.300M5 11a7 7 0 0 0 11.200 5.600M19 11a7 7 0 0 1-.6 2.800M12 18v3"/></svg>',
+    cam: '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10.500 22 7v10l-7-3.500"/></svg>',
+    camoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18M15 15v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1M9 6h4a2 2 0 0 1 2 2v3l7-4v10"/></svg>',
+    end: '<svg viewBox="0 0 24 24"><path d="M3 14.500c5-4.500 13-4.500 18 0l-2 3-3.500-1.500v-2.500c-2-.8-5-.8-7 0v2.500L5 17.500z"/></svg>'
+  };
+  function icon(btn, key) { btn.innerHTML = ICO[key]; } // ไอคอนเป็นค่าคงที่ในโค้ด ไม่ใช่ข้อมูลจากผู้ใช้
+  icon($('b-mic'), 'mic'); icon($('b-cam'), 'cam'); icon($('b-end'), 'end');
+  if (KIND !== 'video') $('c-cam').hidden = true;
+
+  var role = '', pc = null, stream = null, after = 0, ice = [{ urls: 'stun:stun.l.google.com:19302' }];
+  var started = false, finished = false, offered = false, answered = false, timerT = null, pollT = null, t0 = 0, connAt = 0, discT = null, wake = null;
+
+  function setSt(t) { $('st').textContent = t; }
+  function show(title, text) { $('m-t').textContent = title; $('m-p').textContent = text || ''; $('msg').classList.add('show'); $('m-b').focus(); }
+  $('m-b').onclick = function () { try { window.close(); } catch (e) {} setTimeout(function () { $('m-b').textContent = 'ปิดแท็บนี้ได้เลย'; }, 300); };
+
+  function post(action, body, keep) {
+    var o = { ct: CT, action: action }; for (var k in body) o[k] = body[k];
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o), redirect: 'follow', keepalive: !!keep, cache: 'no-store', credentials: 'omit' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (!j || !j.ok) { var e = new Error((j && j.msg) || 'ผิดพลาด'); e.code = j && j.code; throw e; } return j.data; });
+  }
+
+  function cleanup() {
+    finished = true; clearInterval(timerT); clearTimeout(pollT); clearTimeout(discT);
+    try { if (pc) pc.close(); } catch (e) {} pc = null;
+    try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null;
+    try { if (wake) wake.release(); } catch (e) {}
+    $('remote').srcObject = null; $('local').srcObject = null;
+  }
+  function finish(title, text) { if (finished) return; cleanup(); show(title, text); }
+  var FIN = { ended: ['จบการโทร', 'อีกฝ่ายวางสายแล้ว หรือการสนทนาสิ้นสุดลง'], declined: ['ไม่รับสาย', 'อีกฝ่ายปฏิเสธสาย'], missed: ['ไม่มีผู้รับสาย', 'ลองโทรใหม่อีกครั้ง หรือพิมพ์แชทไว้ก่อนได้'], cancelled: ['ยกเลิกสายแล้ว', ''] };
+
+  function hang() {
+    if (finished) return;
+    var dur = connAt ? ' (' + $('tm').textContent + ')' : '';
+    post('end', {}).catch(function () {});
+    finish('จบการโทร' + dur, '');
+  }
+  $('b-end').onclick = hang;
+  window.addEventListener('pagehide', function () { if (!finished && started) { try { post('end', {}, true); } catch (e) {} } });
+
+  $('b-mic').onclick = function () {
+    if (!stream) return; var t = stream.getAudioTracks()[0]; if (!t) return;
+    t.enabled = !t.enabled; icon(this, t.enabled ? 'mic' : 'micoff'); this.classList.toggle('on', !t.enabled);
+    this.setAttribute('aria-pressed', String(!t.enabled)); this.setAttribute('aria-label', t.enabled ? 'ปิดไมค์' : 'เปิดไมค์');
+  };
+  $('b-cam').onclick = function () {
+    if (!stream) return; var t = stream.getVideoTracks()[0]; if (!t) return;
+    t.enabled = !t.enabled; icon(this, t.enabled ? 'cam' : 'camoff'); this.classList.toggle('on', !t.enabled);
+    this.setAttribute('aria-pressed', String(!t.enabled)); this.setAttribute('aria-label', t.enabled ? 'ปิดกล้อง' : 'เปิดกล้อง');
+    $('local').style.opacity = t.enabled ? 1 : .25;
+  };
+
+  function media() {
+    var md = navigator.mediaDevices;
+    if (!md || !md.getUserMedia) return Promise.reject({ name: 'NoApi' });
+    if (KIND === 'video') {
+      return md.getUserMedia({ audio: true, video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } }).catch(function (e) {
+        if (e && (e.name === 'NotFoundError' || e.name === 'NotAllowedError' || e.name === 'OverconstrainedError' || e.name === 'NotReadableError')) {
+          return md.getUserMedia({ audio: true }).then(function (s) { setSt('ใช้กล้องไม่ได้ จึงต่อสายแบบเสียงอย่างเดียว'); $('c-cam').hidden = true; return s; });
+        }
+        throw e;
+      });
+    }
+    return md.getUserMedia({ audio: true });
+  }
+  function mediaErr(e) {
+    var n = e && e.name;
+    if (n === 'NotAllowedError' || n === 'SecurityError') return ['ยังไม่ได้อนุญาตไมโครโฟน', 'กดไอคอนแม่กุญแจข้างช่องที่อยู่เว็บ แล้วเลือก "อนุญาต" ไมโครโฟน (และกล้อง) จากนั้นกลับไปกดโทรใหม่'];
+    if (n === 'NotFoundError') return ['ไม่พบไมโครโฟน', 'ตรวจสอบว่าเครื่องมีไมโครโฟนและเสียบอุปกรณ์เรียบร้อย แล้วลองใหม่'];
+    if (n === 'NotReadableError') return ['เปิดไมโครโฟนไม่ได้', 'อาจมีแอปอื่นกำลังใช้อยู่ ปิดแอปนั้นแล้วลองใหม่'];
+    return ['เริ่มการโทรไม่ได้', 'เบราว์เซอร์นี้ไม่รองรับการโทร ลองใช้ Chrome, Edge หรือ Safari รุ่นล่าสุด'];
+  }
+
+  function newPc() {
+    pc = new RTCPeerConnection({ iceServers: ice });
+    stream.getTracks().forEach(function (t) { pc.addTrack(t, stream); });
+    pc.ontrack = function (ev) {
+      var r = $('remote'); r.srcObject = ev.streams[0] || new MediaStream([ev.track]);
+      if (ev.track.kind === 'video') { r.classList.remove('off'); $('stage').classList.add('has-video'); }
+      var p = r.play(); if (p && p.catch) p.catch(function () { $('tap').hidden = false; });
+    };
+    pc.onconnectionstatechange = function () {
+      var s = pc.connectionState;
+      if (s === 'connected') { clearTimeout(discT); onConnected(); }
+      else if (s === 'disconnected') { setSt('สัญญาณไม่เสถียร กำลังพยายามเชื่อมต่อใหม่...'); clearTimeout(discT); discT = setTimeout(function () { if (pc && pc.connectionState !== 'connected') failNet(); }, 10000); }
+      else if (s === 'failed') failNet();
+    };
+    return pc;
+  }
+  function failNet() {
+    post('end', {}).catch(function () {});
+    finish('เชื่อมต่อไม่สำเร็จ', 'เครือข่ายของคุณหรืออีกฝ่ายอาจบล็อกการโทร (เช่น Wi-Fi ของโรงเรียนหรือองค์กร) ลองสลับไปใช้อินเทอร์เน็ตมือถือแล้วโทรใหม่');
+  }
+  function onConnected() {
+    if (connAt) return; connAt = Date.now(); $('av').classList.remove('ring'); setSt('กำลังสนทนา'); $('tm').hidden = false;
+    timerT = setInterval(function () {
+      var s = Math.floor((Date.now() - connAt) / 1000), m = ('0' + Math.floor(s / 60)).slice(-2), x = ('0' + (s % 60)).slice(-2);
+      $('tm').textContent = m + ':' + x;
+    }, 1000);
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (w) { wake = w; }).catch(function () {}); } catch (e) {}
+  }
+  function gathered() {
+    return new Promise(function (res) {
+      if (pc.iceGatheringState === 'complete') return res();
+      var done = false, fin = function () { if (!done) { done = true; res(); } };
+      pc.addEventListener('icegatheringstatechange', function () { if (pc.iceGatheringState === 'complete') fin(); });
+      setTimeout(fin, 4000);
+    });
+  }
+  function sendSdp(type) {
+    return post('signal', { type: type, data: JSON.stringify({ type: pc.localDescription.type, sdp: pc.localDescription.sdp }) });
+  }
+  function makeOffer() {
+    offered = true; setSt('กำลังเชื่อมต่อ...'); newPc();
+    return pc.createOffer().then(function (o) { return pc.setLocalDescription(o); }).then(gathered).then(function () { return sendSdp('offer'); });
+  }
+  function takeOffer(data) {
+    answered = true; setSt('กำลังเชื่อมต่อ...'); newPc();
+    return pc.setRemoteDescription(JSON.parse(data)).then(function () { return pc.createAnswer(); })
+      .then(function (a) { return pc.setLocalDescription(a); }).then(gathered).then(function () { return sendSdp('answer'); });
+  }
+
+  var fails = 0, setupAt = 0;
+  function tick() {
+    if (finished) return;
+    post('poll', { after: after }).then(function (d) {
+      fails = 0; role = d.role; if (d.ice && d.ice.length) ice = d.ice;
+      if (FIN[d.status]) { var f = FIN[d.status]; return finish(f[0], f[1]); }
+      var work = Promise.resolve();
+      if (d.status === 'active') {
+        if (!setupAt) setupAt = Date.now();
+        if (role === 'caller' && !offered) work = makeOffer();
+        d.sig.forEach(function (s) {
+          if (s.n > after) after = s.n;
+          if (role === 'callee' && s.type === 'offer' && !answered) work = work.then(function () { return takeOffer(s.data); });
+          if (role === 'caller' && s.type === 'answer' && pc && !pc.currentRemoteDescription) work = work.then(function () { return pc.setRemoteDescription(JSON.parse(s.data)); });
+        });
+        if (!connAt && Date.now() - setupAt > 45000) { post('end', {}).catch(function () {}); return finish('เชื่อมต่อไม่สำเร็จ', 'ใช้เวลานานเกินไป ลองโทรใหม่อีกครั้ง'); }
+        if (!connAt && !offered && !answered && role === 'callee') setSt('รออีกฝ่ายเข้าหน้าโทร...');
+      } else if (d.status === 'ringing') {
+        setSt(role === 'caller' ? 'กำลังเรียก... รออีกฝ่ายรับสาย' : 'กำลังเชื่อมต่อ...');
+      }
+      return work;
+    }).catch(function (e) {
+      if (e && e.code === 'AUTH') return finish('ลิงก์การโทรหมดอายุ', 'กลับไปที่เว็บแล้วกดโทรใหม่อีกครั้ง');
+      if (++fails >= 6) return finish('ติดต่อเซิร์ฟเวอร์ไม่ได้', 'ตรวจสอบอินเทอร์เน็ตของคุณ แล้วลองโทรใหม่');
+      if (e && e.name === 'InvalidStateError' || e && e.name === 'OperationError') { post('end', {}).catch(function () {}); return finish('เชื่อมต่อไม่สำเร็จ', 'ลองโทรใหม่อีกครั้ง'); }
+    }).then(function () { if (!finished) pollT = setTimeout(tick, connAt ? 3500 : 1300); });
+  }
+
+  function init() {
+    if (!API_OK || !CT) { show('ลิงก์การโทรไม่ถูกต้อง', 'กรุณากลับไปที่เว็บ Care Center แล้วกดปุ่มโทรจากหน้าแชทอีกครั้ง'); return; }
+    $('who').textContent = PEER || 'การโทร'; $('ini').textContent = (PEER || '?').trim().charAt(0).toUpperCase();
+    if (!window.RTCPeerConnection) { var e0 = mediaErr({}); show(e0[0], e0[1]); return; }
+    media().then(function (s) {
+      stream = s; started = true;
+      if (s.getVideoTracks().length) { var l = $('local'); l.srcObject = s; l.hidden = false; }
+      setSt('กำลังเชื่อมต่อ...'); tick();
+    }).catch(function (e) {
+      post('end', {}).catch(function () {});
+      var m = mediaErr(e); show(m[0], m[1]);
+    });
+  }
+  $('tap').onclick = function () { $('remote').play().catch(function () {}); this.hidden = true; };
+  init();
+})();
+</script>
+</body>
+</html>
