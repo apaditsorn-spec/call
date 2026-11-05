@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Care Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b5ed7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Care Center">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  html,body{margin:0;height:100%;background:#f3f7ff}
+  iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#f3f7ff}
+  #err{display:none;font:16px sans-serif;padding:24px;color:#14213d}
+</style>
+</head>
+<body>
+<!-- ===== แก้ได้แค่บรรทัดเดียวนี้: วางลิงก์เว็บ Apps Script (ลิงก์ที่ลงท้ายด้วย /exec) ระหว่างเครื่องหมาย " ===== -->
+<script>var APP_URL = "วางลิงก์ที่ลงท้ายด้วย /exec ที่นี่";</script>
+<iframe id="app" title="Care Center" allow="clipboard-write; fullscreen"></iframe>
+<div id="err">ยังไม่ได้ตั้งลิงก์เว็บ Care Center ในไฟล์ index.html (ตัวแปร APP_URL)</div>
+<script>
+  if (/^https:\/\/script\.google\.com\/[^\s"]+$/.test(APP_URL)) document.getElementById('app').src = APP_URL;
+  else { document.getElementById('app').style.display = 'none'; document.getElementById('err').style.display = 'block'; }
+</script>
+</body>
+</html>
