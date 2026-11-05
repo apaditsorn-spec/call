@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex,nofollow">
-<title>การโทร · CP ALL ถาม-ตอบ ทวิภาคี</title>
+<title>การโทร · Care Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -57,7 +57,7 @@ body{font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--ink);backgrou
 <div class="stage" id="stage">
   <video id="remote" autoplay playsinline class="off"></video>
   <video id="local" autoplay playsinline muted hidden></video>
-  <div class="top"><div class="brand">CP ALL ถาม-ตอบ ทวิภาคี</div></div>
+  <div class="top"><div class="brand">Care Center</div></div>
   <div class="mid">
     <div class="av ring" id="av" aria-hidden="true"><span id="ini">?</span></div>
     <h1 class="who" id="who">กำลังเตรียมการโทร</h1>
@@ -238,7 +238,7 @@ body{font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--ink);backgrou
   }
 
   function init() {
-    if (!API_OK || !CT) { show('ลิงก์การโทรไม่ถูกต้อง', 'กรุณากลับไปที่เว็บ CP ALL ถาม-ตอบ ทวิภาคี แล้วกดปุ่มโทรจากหน้าแชทอีกครั้ง'); return; }
+    if (!API_OK || !CT) { show('ลิงก์การโทรไม่ถูกต้อง', 'กรุณากลับไปที่เว็บ Care Center แล้วกดปุ่มโทรจากหน้าแชทอีกครั้ง'); return; }
     $('who').textContent = PEER || 'การโทร'; $('ini').textContent = (PEER || '?').trim().charAt(0).toUpperCase();
     if (!window.RTCPeerConnection) { var e0 = mediaErr({}); show(e0[0], e0[1]); return; }
     media().then(function (s) {
